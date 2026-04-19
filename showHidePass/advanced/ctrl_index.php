@@ -7,9 +7,25 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-function validateUser($username, $password) {
-    if($username === "the_young_swag" && $password === "011603"){
-        return true;
+$existingAcc = [
+    "acc1" => [
+        "username" => "the_young_swag",
+        "password" => "011603"
+    ],
+    "acc2" => [
+        "username" => "xplizitNM7",
+        "password" => "011603"
+    ]
+];
+
+
+function validateUser($existingAcc, $username, $password) {
+    foreach($existingAcc as $account){
+        if($account["username"] === $username){
+            if ($account["password"] === $password){
+                return true;
+            }
+        }
     }
     return false;
 }
@@ -17,7 +33,7 @@ function validateUser($username, $password) {
 $username = $_POST['username'] ?? '';
 $password = $_POST['password'] ?? '';
 
-$isValid = validateUser($username, $password);
+$isValid = validateUser($existingAcc,$username, $password);
 
 if ($isValid) {
     $_SESSION['username'] = $username; // only set session AFTER validation passes

@@ -1,0 +1,66 @@
+<form id="form">
+    <label for="username">username</label>
+    <input id="username" name="username" type="text">
+    <label for="password">password</label>
+    <input id="password" name="password" type="password"> 
+    <button type="button" id="toggleBtn">show</button>
+    <button type="submit">submit</button>
+</form>
+<div id="output"></div>
+
+<script>
+    const form = document.getElementById("form");
+    const toggle = document.getElementById("toggleBtn")
+    const showHide = document.getElementById("password")
+    const output = document.getElementById("output");
+
+
+    toggle.addEventListener("click",function(e){
+        e.preventDefault();
+
+    if(showHide.type === 'password'){
+        toggle.textContent = "hide"
+        showHide.type = 'text';
+    }else{
+        toggle.textContent = "show"
+        showHide.type = 'password'
+    }
+
+    });
+
+
+    async function validateUser(formData) {
+        const response = await fetch("ctrl_index.php",{
+            method: "POST",
+            body: formData
+        }
+    );
+
+    if (response.ok){
+        const data = await response.json(); // parse the response
+        return data;                        // return it to the listener
+
+    } else{
+        throw new Error(`Server error: ${response.status}`);
+    }
+    }
+
+    form.addEventListener("submit", async(e)=>{
+        e.preventDefault();
+       
+        try{
+            const result = await validateUser(new FormData(form));
+            
+            if(result.success){
+                window.location.href = "welcome.php";
+            } else{
+                output.textContent = result.message;
+            }
+
+        }catch(error){
+            console.error(`An Error Occured: ${error}`);
+        }
+    });
+
+
+</script>
