@@ -1,24 +1,34 @@
 <?php
 require_once "dbConnect.php";
 
+header("Content-Type: application/json");
 
-
-function loadTask(){
-    global $pdo;
-        // 1. write your SQL question
-    $sql = "SELECT * FROM listContent";
-
-    // 2. prepare it — PDO checks it's valid SQL
-    $stmt = $pdo->prepare($sql);
-
-    // 3. execute it — actually runs the query
-    $stmt->execute();
-
-    // 4. fetch all results as an array
-    $tasks = $stmt->fetchAll();
-    
-    return $tasks;
-
+//  ROUTING 
+if ($_SERVER["REQUEST_METHOD"] === "GET") {
+    echo json_encode(loadTask());
 }
 
-echo json_encode(loadTask());
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    createTask($_POST["task"] ?? '');
+    echo json_encode(["status" => "success"]);
+}
+
+//  LOAD
+function loadTask(){
+    global $pdo;
+
+    $sql = "SELECT * FROM listContent";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute();
+
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+//  CREATE
+function createTask($task){
+    global $pdo;
+
+    $sql = "INSERT INTO listContent (listContent) VALUES (?)";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([$task]);
+}
